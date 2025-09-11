@@ -1,6 +1,0 @@
-#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
-#Thu Sep 11 12:25:41 HKT 2025
-jsr305-3.0.2.jar>alimaven=
-jsr305-3.0.2.jar>central=
-jsr305-3.0.2.pom>alimaven=
-jsr305-3.0.2.pom>central=

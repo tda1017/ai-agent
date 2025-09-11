@@ -1,6 +1,0 @@
-#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
-#Thu Sep 11 12:25:41 HKT 2025
-antlr4-runtime-4.13.1.jar>alimaven=
-antlr4-runtime-4.13.1.jar>central=
-antlr4-runtime-4.13.1.pom>alimaven=
-antlr4-runtime-4.13.1.pom>central=

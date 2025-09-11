@@ -1,6 +1,0 @@
-#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
-#Thu Sep 11 12:25:39 HKT 2025
-mockito-core-5.14.2.jar>alimaven=
-mockito-core-5.14.2.jar>central=
-mockito-core-5.14.2.pom>alimaven=
-mockito-core-5.14.2.pom>central=
