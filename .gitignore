@@ -3,7 +3,15 @@ target/
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
-./mvn-repo
+
+### self rules ###
+mvn-repo/
+/note
+src/main/resources/document/
+# 忽略所有 application 配置（含多环境）
+src/main/resources/application*.yml
+src/main/resources/application*.yaml
+src/main/resources/application*.properties
 
 ### STS ###
 .apt_generated
