@@ -1,0 +1,6 @@
+#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
+#Thu Sep 11 12:25:41 HKT 2025
+reactor-core-3.7.9.jar>alimaven=
+reactor-core-3.7.9.jar>central=
+reactor-core-3.7.9.pom>alimaven=
+reactor-core-3.7.9.pom>central=

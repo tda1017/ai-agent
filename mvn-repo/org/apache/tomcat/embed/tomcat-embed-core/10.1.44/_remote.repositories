@@ -1,0 +1,6 @@
+#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
+#Thu Sep 11 12:25:39 HKT 2025
+tomcat-embed-core-10.1.44.jar>alimaven=
+tomcat-embed-core-10.1.44.jar>central=
+tomcat-embed-core-10.1.44.pom>alimaven=
+tomcat-embed-core-10.1.44.pom>central=

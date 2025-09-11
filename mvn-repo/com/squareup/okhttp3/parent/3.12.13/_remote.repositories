@@ -1,0 +1,4 @@
+#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
+#Thu Sep 11 12:23:22 HKT 2025
+parent-3.12.13.pom>alimaven=
+parent-3.12.13.pom>central=
