@@ -25,4 +25,18 @@ class AiAgentApplicationTests {
         Assertions.assertNotNull(answer);
     }
 
+    @Test
+    void doChatWithTools() {
+        // 测试网页抓取：恋爱案例分析
+        testMessage("最近和对象吵架了，看看编程导航网站（codefather.cn）的其他情侣是怎么解决矛盾的？");
+    }
+
+    private void testMessage(String message) {
+        // ?
+        String chatId = UUID.randomUUID().toString();
+        String answer = app.doChatWithTools(message, chatId);
+        System.out.println("answer: " + answer);
+        Assertions.assertNotNull(answer);
+    }
+
 }
