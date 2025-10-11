@@ -40,3 +40,5 @@ build/
 
 ### VS Code ###
 .vscode/
+# Ignore sensitive config
+src/main/resources/mcp-servers.json
