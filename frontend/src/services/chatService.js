@@ -7,8 +7,8 @@ const SSE_ENDPOINTS = {
 };
 
 const { VITE_USE_MOCK_STREAM, PROD } = import.meta.env;
-const USE_MOCK_STREAM = !PROD && VITE_USE_MOCK_STREAM !== 'false';
-
+// const USE_MOCK_STREAM = !PROD && VITE_USE_MOCK_STREAM !== 'false';
+const USE_MOCK_STREAM = false;  // 强制关闭 mock，使用真实后端
 const MOCK_RESPONSES = {
   app: [
     [
@@ -93,8 +93,9 @@ function openStream(endpoint, params, callbacks, mockKey) {
 }
 
 export function streamAppChat(sessionId, prompt, callbacks) {
+  // 临时使用 manus 模式（不使用 RAG），避免 embedding 404 错误
   return openStream(
-    SSE_ENDPOINTS.app,
+    SSE_ENDPOINTS.manus,
     { sessionId, prompt },
     callbacks,
     'app'
