@@ -11,10 +11,10 @@ import ChatInterface from '../components/chat/ChatInterface.vue';
 import { sendManusPrompt, streamManusChat } from '../services/chatService';
 
 const chatConfig = {
-  title: 'AI 超级智能体',
-  description: '联合多工具的复杂任务调度入口，暂以模拟数据演示流式回复效果。',
-  placeholder: '描述你的复杂目标，回车发送',
-  loadingText: '智能体推理中...',
+  title: '智能体协同',
+  description: '多工具调用与任务协同，处理复杂问题',
+  placeholder: '描述你的复杂任务',
+  loadingText: '智能体思考中...',
   theme: 'purple'
 };
 </script>

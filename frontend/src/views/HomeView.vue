@@ -8,8 +8,8 @@
           </svg>
           <span>新一代 AI 平台</span>
         </div>
-        <h1 class="hero-title">构建智能对话<br/>与协同系统</h1>
-        <p class="hero-description">整合先进的 AI 能力，提供实时对话和智能体协同服务</p>
+        <h1 class="hero-title">DeepSeek AI 助手<br/>智能对话平台</h1>
+        <p class="hero-description">基于 DeepSeek 模型，提供专业、准确的 AI 对话服务</p>
       </div>
     </section>
 
@@ -22,8 +22,8 @@
             </svg>
           </div>
           <div class="card-content">
-            <h3>AI 对话</h3>
-            <p>实时流式响应，智能上下文理解</p>
+            <h3>DeepSeek 对话</h3>
+            <p>通用 AI 助手，支持各类问题解答</p>
           </div>
           <div class="card-arrow">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -39,8 +39,8 @@
             </svg>
           </div>
           <div class="card-content">
-            <h3>超级智能体</h3>
-            <p>多智能体协同，可视化推理过程</p>
+            <h3>智能体协同</h3>
+            <p>多工具调用与任务协同，处理复杂问题</p>
           </div>
           <div class="card-arrow">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -89,7 +89,7 @@
 }
 
 .hero-badge svg {
-  color: var(--color-primary);
+  color: var(--color-text-primary);
 }
 
 .hero-title {
@@ -124,11 +124,11 @@
 .feature-card {
   display: flex;
   align-items: center;
-  gap: var(--space-lg);
-  padding: var(--space-xl);
+  gap: var(--space-md);
+  padding: var(--space-lg);
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-md);
   text-decoration: none;
   color: inherit;
   transition: var(--transition-normal);
@@ -136,9 +136,8 @@
 }
 
 .feature-card:hover {
-  border-color: var(--color-border-light);
   background: var(--color-surface-elevated);
-  transform: translateY(-2px);
+  border-color: var(--color-text-primary);
 }
 
 .feature-card:hover .card-arrow {
@@ -147,19 +146,20 @@
 
 .card-icon {
   flex-shrink: 0;
-  width: 48px;
-  height: 48px;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(96, 165, 250, 0.1);
-  border-radius: var(--radius-md);
+  background: var(--color-surface-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
 }
 
 .card-icon svg {
-  width: 24px;
-  height: 24px;
-  color: var(--color-primary);
+  width: 20px;
+  height: 20px;
+  color: var(--color-text-primary);
 }
 
 .card-content {
