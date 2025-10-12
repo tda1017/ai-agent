@@ -3,12 +3,21 @@
     <header class="app-header">
       <div class="header-content">
         <RouterLink class="brand" to="/">
-          <div class="brand-icon">🤖</div>
+          <div class="brand-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+              <path d="M2 17l10 5 10-5M2 12l10 5 10-5"/>
+            </svg>
+          </div>
           <span class="brand-text">AI Agent</span>
         </RouterLink>
         <nav class="nav">
-          <RouterLink to="/apps" class="nav-link">AI 应用</RouterLink>
-          <RouterLink to="/manus" class="nav-link">超级智能体</RouterLink>
+          <RouterLink to="/apps" class="nav-link">
+            <span>AI 应用</span>
+          </RouterLink>
+          <RouterLink to="/manus" class="nav-link">
+            <span>超级智能体</span>
+          </RouterLink>
         </nav>
       </div>
     </header>
@@ -26,31 +35,31 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  background: var(--color-background);
 }
 
 .app-header {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: var(--color-surface-elevated);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-  box-shadow: var(--shadow-sm);
+  background: rgba(30, 41, 59, 0.8);
+  backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid var(--color-border);
 }
 
 .header-content {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: var(--space-md) var(--space-lg);
+  padding: var(--space-md) var(--space-xl);
 }
 
 .brand {
   display: flex;
   align-items: center;
-  gap: var(--space-sm);
+  gap: var(--space-md);
   text-decoration: none;
   color: var(--color-text-primary);
   font-weight: 700;
@@ -59,80 +68,74 @@
 }
 
 .brand:hover {
-  transform: translateY(-1px);
+  opacity: 0.8;
 }
 
 .brand-icon {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
   background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
   border-radius: var(--radius-md);
-  font-size: 16px;
+  padding: 6px;
+}
+
+.brand-icon svg {
+  width: 100%;
+  height: 100%;
+  color: #0f172a;
 }
 
 .brand-text {
-  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  letter-spacing: -0.02em;
 }
 
 .nav {
   display: flex;
-  gap: var(--space-lg);
+  gap: var(--space-xs);
 }
 
 .nav-link {
   position: relative;
-  color: var(--color-text-secondary);
+  color: var(--color-text-muted);
   text-decoration: none;
   font-weight: 500;
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-sm);
   padding: var(--space-sm) var(--space-md);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-sm);
   transition: var(--transition-normal);
+}
+
+.nav-link span {
+  position: relative;
+  z-index: 1;
 }
 
 .nav-link:hover {
   color: var(--color-text-primary);
-  background: rgba(59, 130, 246, 0.05);
+  background: var(--color-surface);
 }
 
 .nav-link.router-link-active {
-  color: var(--color-primary);
-  background: rgba(59, 130, 246, 0.1);
-}
-
-.nav-link.router-link-active::after {
-  content: '';
-  position: absolute;
-  bottom: -1px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 20px;
-  height: 2px;
-  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
-  border-radius: 1px;
+  color: var(--color-text-primary);
+  background: var(--color-surface);
 }
 
 .app-main {
   flex: 1;
-  padding: var(--space-lg);
+  padding: var(--space-xl);
 }
 
 /* 响应式设计 */
 @media (max-width: 768px) {
   .header-content {
-    padding: var(--space-md);
-    flex-wrap: wrap;
-    gap: var(--space-md);
+    padding: var(--space-md) var(--space-lg);
   }
 
   .nav {
-    gap: var(--space-md);
+    gap: var(--space-xs);
   }
 
   .brand {
@@ -140,30 +143,26 @@
   }
 
   .brand-icon {
-    width: 28px;
-    height: 28px;
-    font-size: 14px;
+    width: 32px;
+    height: 32px;
   }
 
   .app-main {
-    padding: var(--space-md);
+    padding: var(--space-lg);
+  }
+
+  .nav-link {
+    padding: var(--space-xs) var(--space-sm);
   }
 }
 
 @media (max-width: 480px) {
   .header-content {
-    flex-direction: column;
-    align-items: flex-start;
+    padding: var(--space-md);
   }
 
-  .nav {
-    width: 100%;
-    justify-content: flex-start;
-  }
-
-  .nav-link {
-    padding: var(--space-xs) var(--space-sm);
-    font-size: var(--font-size-sm);
+  .app-main {
+    padding: var(--space-md);
   }
 }
 </style>

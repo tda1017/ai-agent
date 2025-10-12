@@ -1,57 +1,65 @@
 :root {
-  /* 设计令牌 - 消除重复定义 */
-  --color-primary: #3b82f6;
-  --color-primary-dark: #2563eb;
-  --color-secondary: #8b5cf6;
-  --color-accent: #06b6d4;
+  /* 深色主题设计令牌 */
+  --color-primary: #60a5fa;
+  --color-primary-dark: #3b82f6;
+  --color-secondary: #a78bfa;
+  --color-accent: #22d3ee;
 
-  --color-text-primary: #0f172a;
-  --color-text-secondary: #475569;
-  --color-text-muted: #64748b;
+  /* 深色主题文本颜色 */
+  --color-text-primary: #f1f5f9;
+  --color-text-secondary: #cbd5e1;
+  --color-text-muted: #94a3b8;
 
-  --color-surface: #ffffff;
-  --color-surface-elevated: rgba(255, 255, 255, 0.95);
-  --color-background: #fafafa;
-  --color-background-gradient: linear-gradient(135deg, #fafafa 0%, #f1f5f9 100%);
+  /* 深色主题背景颜色 */
+  --color-surface: #1e293b;
+  --color-surface-elevated: #334155;
+  --color-surface-hover: #475569;
+  --color-background: #0f172a;
+  --color-background-gradient: radial-gradient(ellipse at top, #1e293b, #0f172a);
 
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 24px;
+  /* 边框颜色 */
+  --color-border: rgba(148, 163, 184, 0.1);
+  --color-border-light: rgba(148, 163, 184, 0.05);
 
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
-  --shadow-primary: 0 8px 32px rgba(59, 130, 246, 0.15);
+  /* 圆角 */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
 
+  /* 阴影 - 深色主题需要更微妙的阴影 */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
+  --shadow-primary: 0 8px 32px rgba(96, 165, 250, 0.2);
+
+  /* 间距 */
   --space-xs: 4px;
   --space-sm: 8px;
   --space-md: 16px;
   --space-lg: 24px;
   --space-xl: 32px;
   --space-2xl: 48px;
+  --space-3xl: 64px;
 
+  /* 字体大小 */
   --font-size-xs: 12px;
   --font-size-sm: 14px;
   --font-size-base: 16px;
   --font-size-lg: 18px;
   --font-size-xl: 24px;
   --font-size-2xl: 32px;
-  --font-size-3xl: 40px;
+  --font-size-3xl: 48px;
 
-  --transition-fast: 0.15s ease;
-  --transition-normal: 0.2s ease;
+  /* 动画 */
+  --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 
-  /* 响应式断点 */
-  --breakpoint-sm: 640px;
-  --breakpoint-md: 768px;
-  --breakpoint-lg: 1024px;
-
-  color-scheme: light dark;
-  font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft Yahei", sans-serif;
+  color-scheme: dark;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft Yahei", sans-serif;
   font-size: var(--font-size-base);
   line-height: 1.6;
-  background: var(--color-background-gradient);
+  background: var(--color-background);
   color: var(--color-text-primary);
 }
 
@@ -62,8 +70,9 @@
 body {
   margin: 0;
   min-height: 100vh;
-  background: var(--color-background-gradient);
+  background: var(--color-background);
   color: var(--color-text-primary);
+  overflow-x: hidden;
 }
 
 #app {
@@ -109,9 +118,10 @@ textarea {
   outline: none;
 }
 
-/* 滚动条样式 */
+/* 滚动条样式 - 深色主题优化 */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
@@ -119,10 +129,16 @@ textarea {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--color-text-muted);
-  border-radius: 3px;
+  background: var(--color-surface-elevated);
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-text-secondary);
+  background: var(--color-surface-hover);
+}
+
+/* 选中文本样式 */
+::selection {
+  background: rgba(96, 165, 250, 0.3);
+  color: var(--color-text-primary);
 }
