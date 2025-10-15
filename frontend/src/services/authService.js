@@ -1,82 +1,53 @@
 import httpClient from './httpClient'
+import { CODE_OK } from '../utils/errorCodes'
 
 const authService = {
   async login(credentials) {
-    // TODO: 后端路径确定后替换
-    // const { data } = await httpClient.post('/auth/login', credentials)
-    // return data
-    
-    // Mock implementation
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        if (credentials.username === 'demo' && credentials.password === 'demo') {
-          resolve({
-            token: 'mock-jwt-token-' + Date.now(),
-            refreshToken: 'mock-refresh-token-' + Date.now(),
-            user: {
-              id: '1',
-              username: credentials.username,
-              email: 'demo@example.com',
-              avatar: null,
-              createdAt: Date.now()
-            }
-          })
-        } else {
-          reject({
-            response: {
-              data: {
-                message: '用户名或密码错误'
-              }
-            }
-          })
+    const { data } = await httpClient.post('/auth/login', credentials)
+    if (data.code === CODE_OK && data.data) {
+      return {
+        token: data.data.token,
+        user: {
+          id: data.data.user.id,
+          username: data.data.user.username,
+          email: null,
+          avatar: null,
+          createdAt: Date.now()
         }
-      }, 500)
-    })
+      }
+    }
+    throw new Error(data.message || '登录失败')
   },
   
   async register(userData) {
-    // TODO: 后端路径确定后替换
-    // const { data } = await httpClient.post('/auth/register', userData)
-    // return data
-    
-    // Mock implementation
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({
-          success: true,
-          message: '注册成功',
-          userId: 'mock-user-id-' + Date.now()
-        })
-      }, 500)
-    })
+    const { data } = await httpClient.post('/auth/register', userData)
+    if (data.code === CODE_OK && data.data) {
+      return {
+        success: true,
+        message: data.message || '注册成功',
+        userId: data.data.id
+      }
+    }
+    throw new Error(data.message || '注册失败')
   },
   
   async logout() {
-    // TODO: 后端路径确定后替换
-    // await httpClient.post('/auth/logout')
     return Promise.resolve()
   },
   
   async refresh(refreshToken) {
-    // TODO: 后端路径确定后替换
-    // const { data } = await httpClient.post('/auth/refresh', { refreshToken })
-    // return data
-    
-    // Mock implementation
     return Promise.resolve({
-      token: 'mock-jwt-token-refreshed-' + Date.now(),
-      refreshToken: 'mock-refresh-token-refreshed-' + Date.now()
+      token: 'refreshed-token-' + Date.now()
     })
   },
   
   async getCurrentUser() {
-    // TODO: 后端路径确定后替换
-    // const { data } = await httpClient.get('/auth/me')
-    // return data
-    
-    // Mock implementation
-    const user = localStorage.getItem('user')
-    return user ? JSON.parse(user) : null
+    const { data } = await httpClient.get('/auth/getUserInfo')
+    if (data.code === CODE_OK) {
+      const user = localStorage.getItem('user')
+      return user ? JSON.parse(user) : null
+    }
+    return null
   }
 }
 

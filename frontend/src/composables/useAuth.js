@@ -1,6 +1,7 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import authService from '@/services/authService'
+import { messageOf } from '@/utils/errorCodes'
 
 const user = ref(null)
 const token = ref(null)
@@ -47,7 +48,9 @@ export function useAuth() {
       
       return response
     } catch (e) {
-      error.value = e.response?.data?.message || '登录失败'
+      // 兼容业务错误({code,message})与 axios 错误结构
+      const msg = messageOf(e?.code, e?.message || e?.response?.data?.message)
+      error.value = msg || '登录失败'
       throw e
     } finally {
       loading.value = false
@@ -77,7 +80,8 @@ export function useAuth() {
         password: userData.password 
       })
     } catch (e) {
-      error.value = e.response?.data?.message || '注册失败'
+      const msg = messageOf(e?.code, e?.message || e?.response?.data?.message)
+      error.value = msg || '注册失败'
       throw e
     } finally {
       loading.value = false

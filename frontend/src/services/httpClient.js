@@ -1,5 +1,6 @@
-﻿import axios from 'axios'
+import axios from 'axios'
 import authService from './authService'
+import { CODE_OK, messageOf } from '../utils/errorCodes'
 
 const httpClient = axios.create({
   baseURL: '/api',
@@ -18,7 +19,16 @@ httpClient.interceptors.request.use(
 )
 
 httpClient.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    // 统一业务成功判断：code === 200
+    const resp = response?.data
+    if (resp && typeof resp === 'object') {
+      if (resp.code === CODE_OK) return response
+      const err = { code: resp.code, message: messageOf(resp.code, resp.message) }
+      return Promise.reject(err)
+    }
+    return response
+  },
   async (error) => {
     const originalRequest = error.config
     
@@ -45,8 +55,10 @@ httpClient.interceptors.response.use(
       }
     }
     
-    console.error('请求失败', error)
-    return Promise.reject(error)
+    // 统一 HTTP 层/网络错误处理
+    const code = error?.code || error?.response?.status || -1
+    const message = error?.response?.data?.message || error?.message || '请求失败'
+    return Promise.reject({ code, message })
   }
 )
 
