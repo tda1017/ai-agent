@@ -3,6 +3,7 @@ package com.xin.aiagent.controller;
 import com.xin.aiagent.app.App;
 import com.xin.aiagent.controller.dto.SendMessageDTO;
 import com.xin.aiagent.controller.dto.SendMessageResp;
+import com.xin.aiagent.security.UserPrincipal;
 import com.xin.aiagent.service.ChatService;
 import com.xin.aiagent.controller.dto.ChatRequest;
 import jakarta.annotation.Resource;
@@ -10,6 +11,8 @@ import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -43,6 +46,10 @@ public class ChatController {
 
     /**
      * App 聊天：受理请求（非流式）
+     * 接收聊天请求并立即返回确认响应，不执行实际的 AI 对话逻辑
+     *
+     * @param request 聊天请求，包含 sessionId 和 prompt
+     * @return 响应包含确认状态、会话 ID、用户问题和时间戳
      */
     @PostMapping(path = "/doChatWithApp", consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -57,6 +64,10 @@ public class ChatController {
 
     /**
      * Manus（工具模式）聊天：受理请求（非流式）
+     * 接收工具模式聊天请求并立即返回确认响应，不执行实际的工具调用
+     *
+     * @param request 聊天请求，包含 sessionId 和 prompt
+     * @return 响应包含确认状态、会话 ID、用户问题和时间戳
      */
     @PostMapping(path = "/doChatWithManus", consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -71,6 +82,12 @@ public class ChatController {
 
     /**
      * App 聊天：SSE 流式返回（调用云端 RAG）
+     * 使用 Server-Sent Events (SSE) 方式实时流式返回 AI 对话结果
+     * 调用云端 RAG 服务进行检索增强生成
+     *
+     * @param sessionId 会话 ID，用于维护对话上下文
+     * @param prompt 用户问题
+     * @return SseEmitter 对象，用于推送流式数据
      */
     @GetMapping(path = "/doChatWithAppSse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter doChatWithAppSse(@RequestParam("sessionId") String sessionId,
@@ -80,7 +97,12 @@ public class ChatController {
 
     /**
      * Manus（工具模式）聊天：SSE 流式返回
-     * 注意：与 POST /doChatWithManus 路径相同，但方法不同（GET vs POST）。
+     * 使用 Server-Sent Events (SSE) 方式实时流式返回工具模式对话结果
+     * 注意：与 POST /doChatWithManus 路径相同，但方法不同（GET vs POST）
+     *
+     * @param sessionId 会话 ID，用于维护对话上下文
+     * @param prompt 用户问题
+     * @return SseEmitter 对象，用于推送流式数据
      */
     @GetMapping(path = "/doChatWithManus", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter doChatWithManusSse(@RequestParam("sessionId") String sessionId,
@@ -90,6 +112,13 @@ public class ChatController {
 
     // ============== Minimal persistence endpoints ==============
 
+    /**
+     * 持久化聊天消息
+     * 将用户消息保存到数据库并返回包含消息 ID 的响应
+     *
+     * @param req 发送消息请求，包含会话 ID 和消息内容
+     * @return 发送消息响应，包含新创建的消息 ID 等信息
+     */
     @PostMapping(path = "/chat", consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public SendMessageResp chat(@RequestBody @Valid SendMessageDTO req) {
@@ -100,7 +129,11 @@ public class ChatController {
     // ============== 私有工具方法 ==============
 
     /**
-     * 构建 SSE：执行 supplier 获取完整回答，再按片段增量推送，最后发送 done 事件。
+     * 构建 SSE：执行 supplier 获取完整回答，再按片段增量推送，最后发送 done 事件
+     * 异步执行 AI 对话，将完整响应分片推送给客户端
+     *
+     * @param supplier 提供 AI 对话结果的函数式接口
+     * @return SseEmitter 对象，超时时间设置为 10 分钟
      */
     private SseEmitter buildSse(SupplierWithEx<String> supplier) {
         // 10 分钟超时，满足大多数对话场景
@@ -138,7 +171,12 @@ public class ChatController {
     }
 
     /**
-     * 将字符串按 UTF-8 字节序安全地近似固定长度切片。
+     * 将字符串按 UTF-8 字节序安全地近似固定长度切片
+     * 用于将长文本分割成多个片段，以便流式推送
+     *
+     * @param text 待切片的文本
+     * @param maxChars 每个片段的最大字符数
+     * @return 切片后的字符串列表
      */
     private List<String> chunkUtf8(String text, int maxChars) {
         if (text == null || text.isEmpty()) {
@@ -157,6 +195,14 @@ public class ChatController {
         return parts;
     }
 
+    /**
+     * 安全地向 SSE 发送错误信息
+     * 捕获可能的 IO 异常，确保错误处理过程不会抛出未捕获的异常
+     *
+     * @param emitter SSE 发射器
+     * @param code 错误代码
+     * @param message 错误消息
+     */
     private void safeError(SseEmitter emitter, String code, String message) {
         try {
             Map<String, Object> err = new HashMap<>();
@@ -170,14 +216,28 @@ public class ChatController {
         }
     }
 
+    /**
+     * 支持抛出异常的 Supplier 函数式接口
+     * 用于封装可能抛出异常的操作，避免在 Lambda 表达式中处理受检异常
+     */
     @FunctionalInterface
     private interface SupplierWithEx<T> {
         T get() throws Exception;
     }
 
+    /**
+     * 获取当前登录用户的 ID
+     * 从 Spring Security 上下文中提取用户信息
+     *
+     * @return 当前用户 ID
+     * @throws RuntimeException 如果未找到用户信息
+     */
     private Long currentUserId() {
-        // TODO: 替换为真实鉴权（如从 SecurityContext 读取）
-        return 1L;
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.getPrincipal() instanceof UserPrincipal principal) {
+            return principal.getUserId();
+        }
+        throw new RuntimeException("未找到当前用户信息");
     }
 }
 

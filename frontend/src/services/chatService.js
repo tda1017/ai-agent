@@ -142,8 +142,45 @@ export async function getMessages(conversationId, lastId = 0, limit = 50) {
 }
 
 export async function deleteConversation(conversationId) {
-  const { data } = await httpClient.delete(`/conversations/${conversationId}`);
-  return data;
+  try {
+    const url = `/conversations/${conversationId}`
+    const response = await httpClient.delete(url)
+    // 记录一次成功日志，包含状态码与返回体结构
+    // 注意：data 可能为 { success: true } 或空对象
+    console.debug('[chatService] DELETE', {
+      url,
+      status: response?.status,
+      data: response?.data
+    })
+    return response.data
+  } catch (error) {
+    // 失败时打印详细上下文，包含 code/status 与 message
+    console.warn('[chatService] DELETE failed', {
+      conversationId,
+      code: error?.code || error?.response?.status,
+      message: error?.message || error?.response?.data?.message,
+      response: error?.response
+    })
+    // 如果是 403/405，可能是代理或网关不允许 DELETE，尝试兼容端点 POST /{id}/delete
+    const status = error?.response?.status
+    if (status === 403 || status === 405) {
+      try {
+        const compatUrl = `/conversations/${conversationId}/delete`
+        const resp2 = await httpClient.post(compatUrl)
+        console.debug('[chatService] Fallback POST delete ok', { compatUrl, status: resp2?.status, data: resp2?.data })
+        return resp2.data
+      } catch (e2) {
+        console.warn('[chatService] Fallback POST delete failed', {
+          conversationId,
+          code: e2?.response?.status ?? e2?.code,
+          message: e2?.response?.data?.message || e2?.message,
+          response: e2?.response
+        })
+        throw e2
+      }
+    }
+    throw error
+  }
 }
 
 export async function createConversation(title) {

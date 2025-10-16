@@ -96,6 +96,8 @@ const formatTime = (timestamp) => {
 };
 
 const handleDelete = (id) => {
+  // 明确记录点击行为，便于定位是否触发
+  console.debug('[ConversationList] delete click', { id })
   if (confirm('确定删除这条对话记录吗？')) {
     emit('delete', id);
   }

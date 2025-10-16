@@ -160,14 +160,17 @@ async function handleSelectConversation(convId) {
 
 async function handleDeleteConversation(convId) {
   try {
+    console.debug('[ChatInterface] deleteConversation start', { convId })
     await deleteConversation(convId);
     conversations.value = conversations.value.filter(c => c.id !== convId);
     
     if (convId === conversationId.value) {
       startNewConversation();
     }
+    console.debug('[ChatInterface] deleteConversation success', { convId })
   } catch (error) {
     console.error('删除会话失败', error);
+    console.warn('[ChatInterface] deleteConversation failed', error)
     alert('删除失败，请重试');
   }
 }
@@ -212,8 +215,8 @@ const formatTime = (timestamp) => {
   flex-direction: row;
   height: 100%;
   flex: 1;
-  /* 统一聊天区域最大宽度，可按需调整 */
-  --chat-max-width: 1100px;
+  /* 统一内容区域左右padding */
+  --content-padding-x: var(--space-xl);
 }
 
 .chat-main {
@@ -221,22 +224,23 @@ const formatTime = (timestamp) => {
   flex-direction: column;
   flex: 1;
   min-width: 0;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
 }
 
 /* Chat Header */
 .chat-header {
   background: var(--color-surface);
   border-bottom: 1px solid var(--color-border);
-  padding: var(--space-lg) var(--space-xl);
+  padding: var(--space-lg) var(--content-padding-x);
 }
 
 .header-content {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  max-width: var(--chat-max-width);
   width: 100%;
-  margin: 0 auto;
 }
 
 .title-section {
@@ -272,13 +276,11 @@ const formatTime = (timestamp) => {
 .messages {
   flex: 1;
   overflow-y: auto;
-  padding: var(--space-lg);
+  padding: var(--space-xl) var(--content-padding-x);
   display: flex;
   flex-direction: column;
   gap: var(--space-lg);
-  max-width: var(--chat-max-width);
   width: 100%;
-  margin: 0 auto;
 }
 
 .welcome-message {
@@ -420,12 +422,10 @@ const formatTime = (timestamp) => {
 
 /* Composer */
 .composer {
-  padding: var(--space-lg);
+  padding: var(--space-lg) var(--content-padding-x);
   border-top: 1px solid var(--color-border);
   background: var(--color-surface);
-  max-width: var(--chat-max-width);
   width: 100%;
-  margin: 0 auto;
 }
 
 .input-container {
@@ -523,11 +523,11 @@ const formatTime = (timestamp) => {
 /* 响应式设计 */
 @media (max-width: 768px) {
   .chat-page {
-    margin: 0 var(--space-md);
+    --content-padding-x: var(--space-lg);
   }
 
   .chat-header {
-    padding: var(--space-lg);
+    padding: var(--space-lg) var(--content-padding-x);
   }
 
   .header-content {
@@ -546,7 +546,7 @@ const formatTime = (timestamp) => {
   }
 
   .messages {
-    padding: var(--space-md);
+    padding: var(--space-lg) var(--content-padding-x);
   }
 
   .message {
@@ -554,19 +554,18 @@ const formatTime = (timestamp) => {
   }
 
   .composer {
-    padding: var(--space-md);
+    padding: var(--space-lg) var(--content-padding-x);
   }
 }
 
 @media (max-width: 480px) {
   .chat-page {
-    margin: 0;
-    gap: var(--space-sm);
+    --content-padding-x: var(--space-md);
   }
 
   .chat-header {
     border-radius: 0;
-    padding: var(--space-md);
+    padding: var(--space-md) var(--content-padding-x);
   }
 
   .chat-window {

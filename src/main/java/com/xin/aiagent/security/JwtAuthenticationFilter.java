@@ -5,6 +5,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -24,6 +25,7 @@ import java.util.List;
  * 由后续的授权规则决定是否返回 401/403。
  */
 @Component
+@Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
@@ -42,22 +44,34 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         String auth = request.getHeader(header);
+        if (log.isTraceEnabled()) {
+            log.trace("JWT filter: path={}, headerName={}, hasAuthHeader={}, method={}",
+                    request.getRequestURI(), header, StringUtils.hasText(auth), request.getMethod());
+        }
         if (StringUtils.hasText(auth) && auth.startsWith(prefix)) {
             String token = auth.substring(prefix.length());
             try {
                 Claims claims = jwtTokenProvider.parse(token);
                 String username = claims.getSubject();
+                Long userId = ((Number) claims.get("uid")).longValue();
                 @SuppressWarnings("unchecked")
                 List<String> roles = (List<String>) claims.getOrDefault("roles", List.of("ROLE_USER"));
                 List<SimpleGrantedAuthority> authorities = new ArrayList<>();
                 for (String r : roles) {
                     authorities.add(new SimpleGrantedAuthority(r));
                 }
-                var authentication = new UsernamePasswordAuthenticationToken(username, null, authorities);
+                UserPrincipal principal = new UserPrincipal(userId, username);
+                var authentication = new UsernamePasswordAuthenticationToken(principal, null, authorities);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
+                if (log.isDebugEnabled()) {
+                    log.debug("JWT authenticated: userId={}, username={}, roles={}", userId, username, roles);
+                }
             } catch (Exception ignored) {
                 // 解析失败：清理上下文，交由授权规则处理
                 SecurityContextHolder.clearContext();
+                if (log.isWarnEnabled()) {
+                    log.warn("JWT parse failed or invalid token. path={}, reason={}", request.getRequestURI(), ignored.getMessage());
+                }
             }
         }
         filterChain.doFilter(request, response);

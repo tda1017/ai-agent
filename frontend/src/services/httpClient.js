@@ -13,6 +13,16 @@ httpClient.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
     }
+    // 调试日志：观察请求方法/URL/是否带了授权头
+    try {
+      const hasAuth = !!config.headers.Authorization
+      console.debug('[httpClient][request]', {
+        method: config.method?.toUpperCase(),
+        baseURL: config.baseURL,
+        url: config.url,
+        hasAuthHeader: hasAuth
+      })
+    } catch (_) {}
     return config
   },
   (error) => Promise.reject(error)
@@ -38,33 +48,30 @@ httpClient.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config
     
+    // 仅在 401 时处理认证过期
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true
       
-      try {
-        const refreshToken = localStorage.getItem('refreshToken')
-        if (refreshToken) {
-          const data = await authService.refresh(refreshToken)
-          
-          localStorage.setItem('token', data.token)
-          if (data.refreshToken) {
-            localStorage.setItem('refreshToken', data.refreshToken)
-          }
-          
-          originalRequest.headers.Authorization = `Bearer ${data.token}`
-          return httpClient(originalRequest)
-        }
-      } catch (refreshError) {
-        localStorage.clear()
+      // Token 过期，清空并重定向到登录页
+      localStorage.clear()
+      
+      // 避免在登录页面无限循环重定向
+      if (!window.location.pathname.includes('/auth/login')) {
         window.location.href = '/auth/login'
-        return Promise.reject(refreshError)
       }
+      
+      return Promise.reject({ 
+        code: 401, 
+        message: '登录已过期，请重新登录' 
+      })
     }
     
     // 统一 HTTP 层/网络错误处理
-    const code = error?.code || error?.response?.status || -1
+    const status = error?.response?.status
+    const code = status ?? error?.code ?? -1
     const message = error?.response?.data?.message || error?.message || '请求失败'
-    return Promise.reject({ code, message })
+    // 保留响应体用于调试（例如 403/500 时）
+    return Promise.reject({ code, message, response: error?.response })
   }
 )
 
