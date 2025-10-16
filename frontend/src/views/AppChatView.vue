@@ -2,13 +2,12 @@
   <ChatInterface
     :config="chatConfig"
     :stream-function="streamAppChat"
-    :send-function="sendAppPrompt"
   />
 </template>
 
 <script setup>
 import ChatInterface from '../components/chat/ChatInterface.vue';
-import { sendAppPrompt, streamAppChat } from '../services/chatService';
+import { streamAppChat } from '../services/chatService';
 
 const chatConfig = {
   title: 'DeepSeek 助手',

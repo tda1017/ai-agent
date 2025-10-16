@@ -1,6 +1,9 @@
 package com.xin.aiagent.controller;
 
 import com.xin.aiagent.app.App;
+import com.xin.aiagent.controller.dto.SendMessageDTO;
+import com.xin.aiagent.controller.dto.SendMessageResp;
+import com.xin.aiagent.service.ChatService;
 import com.xin.aiagent.controller.dto.ChatRequest;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
@@ -35,6 +38,8 @@ public class ChatController {
 
     @Resource
     private App app;
+    @Resource
+    private ChatService chatService;
 
     /**
      * App 聊天：受理请求（非流式）
@@ -81,6 +86,15 @@ public class ChatController {
     public SseEmitter doChatWithManusSse(@RequestParam("sessionId") String sessionId,
                                          @RequestParam("prompt") String prompt) {
         return buildSse(() -> app.doChatWithTools(prompt, sessionId));
+    }
+
+    // ============== Minimal persistence endpoints ==============
+
+    @PostMapping(path = "/chat", consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public SendMessageResp chat(@RequestBody @Valid SendMessageDTO req) {
+        Long uid = currentUserId();
+        return chatService.send(uid, req.getConversationId(), req.getContent());
     }
 
     // ============== 私有工具方法 ==============
@@ -159,6 +173,11 @@ public class ChatController {
     @FunctionalInterface
     private interface SupplierWithEx<T> {
         T get() throws Exception;
+    }
+
+    private Long currentUserId() {
+        // TODO: 替换为真实鉴权（如从 SecurityContext 读取）
+        return 1L;
     }
 }
 

@@ -20,12 +20,18 @@ httpClient.interceptors.request.use(
 
 httpClient.interceptors.response.use(
   (response) => {
-    // 统一业务成功判断：code === 200
+    // 放宽业务成功判断：
+    // - 如果返回的是数组或无 code 普通对象，则直接放行
+    // - 仅当返回对象包含 code 字段时，按约定校验
     const resp = response?.data
+    if (Array.isArray(resp)) return response
     if (resp && typeof resp === 'object') {
-      if (resp.code === CODE_OK) return response
-      const err = { code: resp.code, message: messageOf(resp.code, resp.message) }
-      return Promise.reject(err)
+      if (Object.prototype.hasOwnProperty.call(resp, 'code')) {
+        if (resp.code === CODE_OK) return response
+        const err = { code: resp.code, message: messageOf(resp.code, resp.message) }
+        return Promise.reject(err)
+      }
+      return response
     }
     return response
   },

@@ -2,13 +2,12 @@
   <ChatInterface
     :config="chatConfig"
     :stream-function="streamManusChat"
-    :send-function="sendManusPrompt"
   />
 </template>
 
 <script setup>
 import ChatInterface from '../components/chat/ChatInterface.vue';
-import { sendManusPrompt, streamManusChat } from '../services/chatService';
+import { streamManusChat } from '../services/chatService';
 
 const chatConfig = {
   title: '智能体协同',

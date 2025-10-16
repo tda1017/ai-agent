@@ -8,35 +8,22 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import java.time.LocalDateTime;
 
-/**
- * 用户实体（M0 极简版本）。
- *
- * 用户名、密码（BCrypt）、邮箱、状态与审计时间。
- */
-@TableName("users")
 @Data
-public class User {
-    /** 主键ID */
+@TableName("conversations")
+public class Conversation {
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
-    /** 用户名（唯一） */
-    private String username;
+    private Long userId;
 
-    /** 密码密文（BCrypt） */
-    private String password;
+    private String title;
 
-    /** 邮箱（唯一，可选） */
-    private String email;
-
-    /** 账号状态：0-禁用，1-正常 */
-    private Integer status;
-
-    /** 创建时间（由实体钩子设置） */
     @TableField(value = "created_at", fill = FieldFill.INSERT)
     private LocalDateTime createdAt;
 
-    /** 更新时间（由实体钩子设置） */
     @TableField(value = "updated_at", fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updatedAt;
+
+    @TableField(value = "deleted_at")
+    private LocalDateTime deletedAt;
 }

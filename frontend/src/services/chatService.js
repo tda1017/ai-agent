@@ -126,3 +126,35 @@ export async function sendManusPrompt(sessionId, prompt) {
   const { data } = await httpClient.post('/doChatWithManus', { sessionId, prompt });
   return data;
 }
+
+// 历史记录相关接口
+export async function getConversations(limit = 20) {
+  const response = await httpClient.get(`/conversations?limit=${limit}`);
+  // 后端直接返回数组，不是 {data: []} 格式
+  return Array.isArray(response.data) ? response.data : [];
+}
+
+export async function getMessages(conversationId, lastId = 0, limit = 50) {
+  const response = await httpClient.get(
+    `/conversations/${conversationId}/messages?lastId=${lastId}&limit=${limit}`
+  );
+  return Array.isArray(response.data) ? response.data : [];
+}
+
+export async function deleteConversation(conversationId) {
+  const { data } = await httpClient.delete(`/conversations/${conversationId}`);
+  return data;
+}
+
+export async function createConversation(title) {
+  const { data } = await httpClient.post('/conversations', title ? { title } : {});
+  return data;
+}
+
+export async function sendMessage(conversationId, content) {
+  const { data } = await httpClient.post('/chat', { 
+    conversationId, 
+    content 
+  });
+  return data;
+}

@@ -1,13 +1,26 @@
 <template>
   <div class="chat-page">
-    <section class="chat-header" :class="themeClass">
-      <div class="header-content">
-        <div class="title-section">
-          <h1>{{ config.title }}</h1>
-          <span class="session-id">{{ sessionId }}</span>
+    <ConversationList
+      :conversations="conversations"
+      :selected-id="conversationId"
+      :loading="loadingConversations"
+      :error="conversationsError"
+      @select="handleSelectConversation"
+      @delete="handleDeleteConversation"
+      @new-conversation="handleNewConversation"
+      @reload="loadConversationList"
+    />
+    
+    <div class="chat-main">
+      <section class="chat-header" :class="themeClass">
+        <div class="header-content">
+          <div class="title-section">
+            <h1>{{ config.title }}</h1>
+            <span v-if="conversationId" class="session-id">会话 #{{ conversationId }}</span>
+            <span v-else class="session-id">新对话</span>
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
 
     <section class="chat-window" :class="themeClass">
       <div ref="messageWrap" class="messages">
@@ -75,12 +88,15 @@
         </div>
       </form>
     </section>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { useChat } from '../../composables/useChat.js';
+import { getConversations, deleteConversation, createConversation } from '../../services/chatService.js';
+import ConversationList from './ConversationList.vue';
 
 const props = defineProps({
   config: {
@@ -97,23 +113,84 @@ const props = defineProps({
   streamFunction: {
     type: Function,
     required: true
-  },
-  sendFunction: {
-    type: Function,
-    required: true
   }
 });
 
 const themeClass = computed(() => `theme-${props.config.theme}`);
 
 const {
-  sessionId,
+  conversationId,
   messages,
   draft,
   isStreaming,
   messageWrap,
-  handleSubmit
-} = useChat(props.streamFunction, props.sendFunction);
+  handleSubmit,
+  switchConversation,
+  startNewConversation
+} = useChat(props.streamFunction);
+
+const conversations = ref([]);
+const loadingConversations = ref(false);
+const conversationsError = ref(null);
+
+async function loadConversationList() {
+  try {
+    loadingConversations.value = true;
+    conversationsError.value = null;
+    const data = await getConversations(20);
+    
+    if (Array.isArray(data)) {
+      conversations.value = data.map(conv => ({
+        id: conv.id,
+        title: conv.title || '新对话',
+        updatedAt: conv.updatedAt
+      }));
+    }
+  } catch (error) {
+    console.error('加载会话列表失败', error);
+    conversationsError.value = '加载失败';
+  } finally {
+    loadingConversations.value = false;
+  }
+}
+
+async function handleSelectConversation(convId) {
+  await switchConversation(convId);
+}
+
+async function handleDeleteConversation(convId) {
+  try {
+    await deleteConversation(convId);
+    conversations.value = conversations.value.filter(c => c.id !== convId);
+    
+    if (convId === conversationId.value) {
+      startNewConversation();
+    }
+  } catch (error) {
+    console.error('删除会话失败', error);
+    alert('删除失败，请重试');
+  }
+}
+
+function handleNewConversation() {
+  // 立即在后端创建会话，拿到 id 后选中
+  createConversation()
+    .then((data) => {
+      const id = data?.id
+      // 列表添加并置顶
+      conversations.value = [{ id, title: data?.title || '新对话', updatedAt: new Date().toISOString() }, ...conversations.value]
+      switchConversation(id)
+    })
+    .catch((e) => {
+      console.error('创建会话失败', e)
+      // 回退到纯前端新会话
+      startNewConversation()
+    })
+}
+
+onMounted(() => {
+  loadConversationList();
+});
 
 // 格式化时间显示
 const formatTime = (timestamp) => {
@@ -132,9 +209,18 @@ const formatTime = (timestamp) => {
 <style scoped>
 .chat-page {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   height: 100%;
   flex: 1;
+  /* 统一聊天区域最大宽度，可按需调整 */
+  --chat-max-width: 1100px;
+}
+
+.chat-main {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
 }
 
 /* Chat Header */
@@ -148,6 +234,9 @@ const formatTime = (timestamp) => {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  max-width: var(--chat-max-width);
+  width: 100%;
+  margin: 0 auto;
 }
 
 .title-section {
@@ -187,6 +276,9 @@ const formatTime = (timestamp) => {
   display: flex;
   flex-direction: column;
   gap: var(--space-lg);
+  max-width: var(--chat-max-width);
+  width: 100%;
+  margin: 0 auto;
 }
 
 .welcome-message {
@@ -210,7 +302,7 @@ const formatTime = (timestamp) => {
 .message {
   display: flex;
   gap: var(--space-md);
-  max-width: 85%;
+  max-width: 100%;
   animation: slideIn 0.3s ease-out;
 }
 
@@ -331,6 +423,9 @@ const formatTime = (timestamp) => {
   padding: var(--space-lg);
   border-top: 1px solid var(--color-border);
   background: var(--color-surface);
+  max-width: var(--chat-max-width);
+  width: 100%;
+  margin: 0 auto;
 }
 
 .input-container {
@@ -455,7 +550,7 @@ const formatTime = (timestamp) => {
   }
 
   .message {
-    max-width: 90%;
+    max-width: 100%;
   }
 
   .composer {
@@ -499,7 +594,7 @@ const formatTime = (timestamp) => {
   }
 
   .message {
-    max-width: 95%;
+    max-width: 100%;
     gap: var(--space-sm);
   }
 

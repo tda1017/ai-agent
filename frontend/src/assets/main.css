@@ -73,6 +73,7 @@ body {
   background: var(--color-background);
   color: var(--color-text-primary);
   overflow-x: hidden;
+  scrollbar-gutter: stable;
 }
 
 #app {
