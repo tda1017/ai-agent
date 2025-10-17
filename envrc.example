@@ -1,0 +1,20 @@
+# Environment Variables for Local Development
+# Copy this file to .envrc and set your real values
+# NOTE: .envrc is git-ignored for security
+
+# Node.js Path (adjust to your setup)
+export PATH="/opt/homebrew/opt/node@22/bin:$PATH"
+
+# DeepSeek API Configuration
+export DEEPSEEK_API_KEY="REPLACE_WITH_YOUR_DEEPSEEK_API_KEY"
+export DEEPSEEK_BASE_URL="https://api.deepseek.com"
+export DEEPSEEK_CHAT_MODEL="deepseek-chat"
+export DEEPSEEK_EMBED_MODEL="deepseek-embedding"
+
+# Database Configuration
+export DB_PASSWORD=""
+
+# JWT Configuration (generate a strong 256-bit secret)
+# You can generate one with: openssl rand -base64 32
+export JWT_SECRET="REPLACE_WITH_OUTPUT_OF_openssl_rand_base64_32"
+export JWT_EXPIRATION="86400000"

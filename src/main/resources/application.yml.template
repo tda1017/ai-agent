@@ -1,0 +1,50 @@
+# Spring Boot Application Configuration Template
+# Copy this file to application.yml or application-local.yml and set real values
+
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/aiAgent?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
+    username: root
+    password: ${DB_PASSWORD:}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  
+  ai:
+    openai:
+      # DeepSeek API Key (required, no default)
+      api-key: ${DEEPSEEK_API_KEY}
+      # DeepSeek OpenAI-compatible Base URL
+      base-url: ${DEEPSEEK_BASE_URL:https://api.deepseek.com}
+      chat:
+        options:
+          model: ${DEEPSEEK_CHAT_MODEL:deepseek-chat}
+      embedding:
+        options:
+          model: ${DEEPSEEK_EMBED_MODEL:deepseek-embedding}
+
+# MyBatis-Plus Configuration
+mybatis-plus:
+  mapper-locations: classpath:mapper/**/*.xml
+  type-aliases-package: com.xin.aiagent.entity
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+# Logging Configuration
+logging:
+  level:
+    org.springframework.security: INFO
+    org.springframework.ai: DEBUG
+    org.springframework.web.reactive.function.client: DEBUG
+
+# Application Switches
+app:
+  vector:
+    # Disable document embedding on startup in dev environment
+    init-on-startup: false
+
+# JWT Configuration (required, no defaults for production)
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: ${JWT_EXPIRATION:86400000}
+  header: ${JWT_HEADER:Authorization}
+  token-prefix: ${JWT_TOKEN_PREFIX:Bearer}

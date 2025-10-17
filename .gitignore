@@ -42,3 +42,6 @@ build/
 .vscode/
 # Ignore sensitive config
 src/main/resources/mcp-servers.json
+.envrc
+.env
+.env.*
