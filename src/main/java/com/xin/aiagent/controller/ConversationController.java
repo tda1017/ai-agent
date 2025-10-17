@@ -22,6 +22,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class ConversationController {
+
     private final ConversationService conversationService;
     private final MessageService messageService;
 

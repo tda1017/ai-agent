@@ -130,7 +130,7 @@ const handleLogin = async () => {
 
 .auth-card {
   width: 100%;
-  max-width: 420px;
+  max-width: 540px;
   padding: var(--space-2xl);
   background: var(--color-surface);
   border: 1px solid var(--color-border);
